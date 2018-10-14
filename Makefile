@@ -22,10 +22,10 @@ fast-install:
 	@echo "\033[95m\nInstalled to /usr/local/lib/python3.6/dist-packages/peeper033[0m"
 	$(MAKE) show-installed-version
 
-test:
-	rm -rf htmlcov/
-	python3 -m pytest --cov=./ --cov-report=html
-	@echo "\033[95m\nTest report htmlcov/index.html\033[0m"
+#test:
+#	rm -rf htmlcov/
+#	python3 -m pytest --cov=./ --cov-report=html
+#	@echo "\033[95m\nTest report htmlcov/index.html\033[0m"
 
 flake8:
 	pipenv run flake8 --ignore=E501,F401,E128,E402,E731,F821,E722 peeper
@@ -33,8 +33,8 @@ flake8:
 pylint:
 	pylint3 -j 8 peeper/* || pylint-exit $?
 
-coverage:
-	pipenv run py.test --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=requests tests
+#coverage:
+#	pipenv run py.test --cov-config .coveragerc --verbose --cov-report term --cov-report xml --cov=requests tests
 
 publish:
 	$(MAKE) clean

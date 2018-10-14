@@ -14,7 +14,7 @@
 * [Examples](#examples)
 * [Install](#install)
 * [Usage and documentation](#usage-and-documentation)
-* [Questions and issues](#questions-and-issues)
+* [Contributing and feedback](#contributing-and-feedback)
 * [License](#license)
 
 </details>
@@ -49,7 +49,7 @@ Different ways, all equals
 ## Usage and documentation
 <a href="https://peeper.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/peeper/badge/?version=latest"></a>
 
-Browse the online documentation here](https://peeper.readthedocs.io/en/latest/)
+Browse the online documentation [here](https://peeper.readthedocs.io/en/latest/)
 or make your own by `make docs`
 
 
