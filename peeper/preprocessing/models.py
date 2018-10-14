@@ -37,6 +37,10 @@ def sample_by_frequency(data, hertz):
 
             averages = sample_data.apply(np.nanmean, axis=0)  # average sample
             row = [sampled_time] + averages.tolist()
+            for j, val in enumerate(row):
+                if np.isnan(val):
+                    row[j] = sampled_data[-1][j]  # last known value
+
             sampled_data.append(row)
 
             start_sample_index = end_sample_index + 1
@@ -89,6 +93,7 @@ class Merger:
             file_name = Document(file).name
             data = data.drop(["Timestamp"], axis=1)  # remove column
             data = data.set_index("Milliseconds")  # set index
+            data = data.groupby(data.index).first()  # remove duplicate index
 
             # rename columns
             new_columns = {

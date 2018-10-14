@@ -11,6 +11,7 @@ Subpackages
 
 .. toctree::
 
+    peeper.analysis
     peeper.ml
     peeper.preprocessing
 

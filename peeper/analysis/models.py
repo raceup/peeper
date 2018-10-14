@@ -2,9 +2,8 @@
 
 """Module containing analysis models"""
 
+import matplotlib.pyplot as plt
 import pandas as pd
-from hal.files.models.files import Document
-from hal.files.models.system import ls_dir
 
 
 class Plotter:
@@ -16,64 +15,87 @@ class Plotter:
         """
 
         self.path = file
-        self.data = {
-            file: pd.read_csv(file)
-            for file in self._find_files()
-        }  # dictionary file name -> file data (as pandas data frame)
+        self.data = self._parse()
+        self.plots = self._create_plots()
 
-    def _find_files(self):
-        """Finds files in folder
+    def _parse(self):
+        """Parses input file
 
-        :return: list of input files in folder
+        :return: data in file
         """
 
-        files = ls_dir(self.path)
-        files = [
-            file
-            for file in files
-            if Document(file).extension == ".csv"  # just csv files
-        ]
-        return files
-
-    def _merge(self):
-        """Merges data frames into one big
-
-        :return: one big data frame with data from all input files
-        """
-
-        dfs = []  # list of data frames
-        for file, data in self.data.items():
-            file_name = Document(file).name
-            data = data.drop(["Timestamp"], axis=1)  # remove column
-            data = data.set_index("Milliseconds")  # set index
-
-            # rename columns
-            new_columns = {
-                col: file_name + " " + col
-                for col in data.keys()
-            }
-            data = data.rename(index=str, columns=new_columns)  # rename columns
-
-            dfs.append(data)
-
-        data = pd.concat(dfs, axis=1, sort=True)  # merge
-
-        # rename rows (convert to float)
-        new_rows = {
-            row: float(row)
-            for row in data.index
-        }
-        data = data.rename(index=new_rows)
-        data = data.sort_index()  # sort by index
+        data = pd.read_csv(self.path)
+        data = data.set_index("Milliseconds")
+        data.index.names = ["Seconds"]
+        data = data.rename(index={
+            x: x / 1000.0
+            for x in data.index
+        })  # convert to s
 
         return data
 
+    def _create_plots(self):
+        """Create plots from data
+
+        :return: dictionary with title and data to plot
+        """
+
+        labels = {
+            "Compass": [
+                key
+                for key in self.data.keys()
+                if key.startswith("Compass")
+            ],
+            "RotationVector": [
+                key
+                for key in self.data.keys()
+                if key.startswith("RotationVector")
+            ],
+            "AccelerometerLinear": [
+                key
+                for key in self.data.keys()
+                if key.startswith("AccelerometerLinear")
+            ],
+            "Gyroscope": [
+                key
+                for key in self.data.keys()
+                if key.startswith("Gyroscope")
+            ]
+        }
+
+        plots = {
+            key: self.data[column_names]
+            for key, column_names in labels.items()
+        }
+        for key, plot in plots.items():
+            new_columns = {
+                column: column.replace(key, "").strip()  # remove unnecessary
+                for column in plot.keys()
+            }
+            plots[key] = plot.rename(columns=new_columns)
+
+        return plots
+
     def save(self, output_file):
-        """Merges all inputs files into one
+        """Saves plot to output
 
         :param output_file: output file (where to write data)
         """
 
-        data = self._merge()
-        data = sample_by_frequency(data, 5)
-        data.to_csv(output_file, index_label="Milliseconds")
+        fig, ax = plt.subplots(2, 2, sharex="all")
+
+        self.plots["Compass"].plot(ax=ax[0, 0], title="Compass")
+        self.plots["RotationVector"].plot(ax=ax[0, 1], title="Rotation vector")
+        self.plots["AccelerometerLinear"] \
+            .plot(ax=ax[1, 0], title="Accelerations")
+        self.plots["Gyroscope"].plot(ax=ax[1, 1], title="Gyro")
+
+        plt.savefig(
+            output_file,
+            dpi=400,
+            quality=100,
+            orientation="landscape",
+            papertype="a4",
+            format="png"
+        )
+        plt.show()

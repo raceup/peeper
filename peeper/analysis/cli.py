@@ -41,15 +41,31 @@ def parse_args(parser):
     return file
 
 
+def get_output_file(file):
+    """Finds output file suitable for input file
+
+    :param file: input file
+    :return: output file
+    """
+
+    output_file = "sensors.png"
+    output_folder = os.path.dirname(file)
+    output_file = os.path.join(output_folder, output_file)
+
+    if not os.path.exists(output_folder):  # create necessary folders
+        os.makedirs(output_folder)
+
+    if os.path.exists(output_file):  # remove any previous outputs
+        os.remove(output_file)
+
+    return output_file
+
+
 def main():
     file = parse_args(create_args())
     log_message("Using file", file)
 
-    output_file = "plot.png"
-    output_file = os.path.join(os.path.dirname(file), output_file)
-
-    if os.path.exists(output_file):  # remove any previous outputs
-        os.remove(output_file)
+    output_file = get_output_file(file)
 
     driver = Plotter(file)
     driver.save(output_file)
