@@ -2,10 +2,52 @@
 
 """Module containing pre-processing models"""
 
+import numpy as np
 import pandas as pd
-
 from hal.files.models.files import Document
 from hal.files.models.system import ls_dir
+
+
+def sample_by_frequency(data, hertz):
+    """Samples data with given frequency. Averages values if multiple
+
+    :param data: data frame
+    :param hertz: frequency, e.g 5 Hz => 1 / 5s => one sample each 0.2s
+    :return: sampled data
+    """
+
+    freq = 1000.0 / hertz  # ms interval between 2 samples
+    sampled_time = 0.0
+    sampled_data = []  # sampled data (each row)
+    start_sample_index = 0  # sample from this index ...
+
+    for i, ms in enumerate(data.index):
+        delta = ms - data.index[start_sample_index]
+
+        if delta >= freq:  # end sample here
+            end_sample_index = i
+
+            while delta > freq and start_sample_index <= end_sample_index:
+                delta = data.index[end_sample_index] - \
+                        data.index[start_sample_index]
+                end_sample_index -= 1
+
+            sampled_time += freq
+            sample_data = data.iloc[start_sample_index: end_sample_index]
+
+            averages = sample_data.apply(np.nanmean, axis=0)  # average sample
+            row = [sampled_time] + averages.tolist()
+            sampled_data.append(row)
+
+            start_sample_index = end_sample_index + 1
+
+    # build data frame from samples
+    sampled_label = "Sample milliseconds"
+    columns = [sampled_label] + list(data.keys())
+    sampled_data = pd.DataFrame(data=sampled_data, columns=columns)
+    sampled_data = sampled_data.set_index(sampled_label)
+
+    return sampled_data
 
 
 class Merger:
@@ -76,4 +118,5 @@ class Merger:
         """
 
         data = self._merge()
+        data = sample_by_frequency(data, 5)
         data.to_csv(output_file, index_label="Milliseconds")
