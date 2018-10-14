@@ -43,18 +43,14 @@ Behold, the power of Peeper
 ---------------------------
 
 Do something awesome
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Using ``peeper``
 ^^^^^^^^^^^^^^^^
 
 .. code:: python
 
-    >>> from hal.tests.gen import TestWriter
-    >>> src = "path to module source folder"
-    >>> out = "path to output folder"
-    >>> w = TestWriter(src)
-    >>> w.write_tests(out)
+    >>> import antigravity
 
 
 Install
