@@ -1,5 +1,5 @@
 ---
 name: Request for Help
-about: Guidance on using <MY AWESOME LIBRARY>
+about: Guidance on using Peeper
 
 ---
