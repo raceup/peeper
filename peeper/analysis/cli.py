@@ -5,9 +5,10 @@
 import argparse
 import os
 
+from hal.files.models.files import Document
 from hal.streams.logger import log_message
 
-from peeper.preprocessing.models import Merger
+from peeper.analysis.models import Plotter
 
 
 def create_args():
@@ -16,10 +17,10 @@ def create_args():
         Parser that handles cmd arguments.
     """
 
-    parser = argparse.ArgumentParser(usage='-d <directory to parse> '
+    parser = argparse.ArgumentParser(usage='-i <input file> '
                                            '-h for full usage')
-    parser.add_argument('-d', dest='dir',
-                        help='directory to use', required=True)
+    parser.add_argument('-i', dest='file',
+                        help='input file', required=True)
     return parser
 
 
@@ -32,27 +33,28 @@ def parse_args(parser):
     """
 
     args = parser.parse_args()
-    directory = str(args.dir)
+    file = str(args.file)
 
-    assert os.path.exists(directory)
+    assert os.path.exists(file)
+    assert Document(file).extension == ".csv"
 
-    return directory
+    return file
 
 
 def main():
-    folder = parse_args(create_args())
-    log_message("Using folder", folder)
+    file = parse_args(create_args())
+    log_message("Using file", file)
 
-    output_file = "Merged.csv"
-    output_file = os.path.join(os.path.dirname(folder), output_file)
+    output_file = "plot.png"
+    output_file = os.path.join(os.path.dirname(file), output_file)
 
     if os.path.exists(output_file):  # remove any previous outputs
         os.remove(output_file)
 
-    driver = Merger(folder)
-    driver.merge_into(output_file)
+    driver = Plotter(file)
+    driver.save(output_file)
 
-    log_message("Merged into", output_file)
+    log_message("Plot saved to", output_file)
 
 
 if __name__ == '__main__':

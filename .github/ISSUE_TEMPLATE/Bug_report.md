@@ -16,8 +16,15 @@ What happened instead.
 
 ## Reproduction Steps
 
-Steps to reproduce the bug
+```python
+import peeper
+
+```
 
 ## System Information
 
-OS type, model ...
+    $ python -m peeper.help
+
+```
+<paste here>
+```
