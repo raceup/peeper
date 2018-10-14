@@ -6,6 +6,14 @@ peeper package
     :undoc-members:
     :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+
+    peeper.ml
+    peeper.preprocessing
+
 Submodules
 ----------
 

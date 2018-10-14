@@ -43,7 +43,10 @@ def main():
     log_message("Using folder", folder)
 
     output_file = "Merged.csv"
-    output_file = os.path.join(folder, output_file)
+    output_file = os.path.join(os.path.dirname(folder), output_file)
+
+    if os.path.exists(output_file):  # remove any previous outputs
+        os.remove(output_file)
 
     driver = Merger(folder)
     driver.merge_into(output_file)

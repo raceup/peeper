@@ -42,7 +42,32 @@ class Merger:
         :return: one big data frame with data from all input files
         """
 
-        return pd.DataFrame()
+        dfs = []  # list of data frames
+        for file, data in self.data.items():
+            file_name = Document(file).name
+            data = data.drop(["Timestamp"], axis=1)  # remove column
+            data = data.set_index("Milliseconds")  # set index
+
+            # rename columns
+            new_columns = {
+                col: file_name + " " + col
+                for col in data.keys()
+            }
+            data = data.rename(index=str, columns=new_columns)  # rename columns
+
+            dfs.append(data)
+
+        data = pd.concat(dfs, axis=1, sort=True)  # merge
+
+        # rename rows (convert to float)
+        new_rows = {
+            row: float(row)
+            for row in data.index
+        }
+        data = data.rename(index=new_rows)
+        data = data.sort_index()  # sort by index
+
+        return data
 
     def merge_into(self, output_file):
         """Merges all inputs files into one
@@ -51,4 +76,4 @@ class Merger:
         """
 
         data = self._merge()
-        data.to_csv(output_file)
+        data.to_csv(output_file, index_label="Milliseconds")
