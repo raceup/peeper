@@ -4,6 +4,7 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from hal.files.models.system import get_parent_folder_name
 
 
 class Plotter:
@@ -83,6 +84,9 @@ class Plotter:
         """
 
         fig, ax = plt.subplots(2, 2, sharex="all")
+        title = get_parent_folder_name(self.path)
+        title = "Telemetry data from " + title.replace("-", ":")
+        fig.suptitle(title)
 
         self.plots["Compass"].plot(ax=ax[0, 0], title="Compass")
         self.plots["RotationVector"].plot(ax=ax[0, 1], title="Rotation vector")

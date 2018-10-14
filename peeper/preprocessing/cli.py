@@ -5,10 +5,11 @@
 import argparse
 import os
 
-from hal.files.models.system import is_folder, ls_recurse
+from hal.files.models.system import is_folder, ls_recurse, \
+    get_parent_folder_name
 from hal.streams.logger import log_message
 
-from peeper.preprocessing.models import Merger
+from peeper.preprocessing.models import Processer
 
 
 def create_args():
@@ -52,7 +53,7 @@ def get_output_file(folder):
     data_day = folders[-3]
     output_file = "sensors.csv"
     output_folder = folder
-    for _ in range(5):
+    for _ in range(4):
         output_folder = os.path.dirname(output_folder)
     output_folder = os.path.join(output_folder, "output", data_day, data_time)
     output_file = os.path.join(output_folder, output_file)
@@ -73,10 +74,11 @@ def pre_process_test(folder):
     :return: Saves processed data
     """
 
+    log_message("Pre-processing", get_parent_folder_name(folder))
     output_file = get_output_file(folder)
 
-    driver = Merger(folder)
-    driver.merge_into(output_file)
+    driver = Processer(folder)
+    driver.combine_into(output_file)
 
     log_message("Merged into", output_file)
 
@@ -99,9 +101,8 @@ def pre_process_day(folder):
         if "Accelerometer.csv" in os.listdir(folder)
     ]
 
-    for day_folder in folders:
-        log_message("Pre-processing", day_folder)
-        pre_process_test(day_folder)
+    for folder in folders:
+        pre_process_test(folder)
 
 
 def main():
