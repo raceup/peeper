@@ -168,7 +168,7 @@ class Processer:
         :return: data frame
         """
         data = self._merge()
-        data = self.sample_by_frequency(data, 10)
+        data = self.sample_by_frequency(data, 50)
         data = self.filter(data, savgol_filter, window_length=13, polyorder=1)
         data = self.remove_null_values(data, 1)
 

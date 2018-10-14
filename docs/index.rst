@@ -1,4 +1,4 @@
-Peeper: A tool to dig deep into telemetry data https://raceup.github.io
+Peeper: A tool to dig deep into telemetry data
 =======================================================================
 
 Release v\ |version|
