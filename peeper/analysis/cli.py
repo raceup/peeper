@@ -6,6 +6,7 @@ import argparse
 import os
 
 from hal.files.models.files import Document
+from hal.files.models.system import ls_recurse, is_file
 from hal.streams.logger import log_message
 
 from peeper.analysis.models import Plotter
@@ -17,10 +18,10 @@ def create_args():
         Parser that handles cmd arguments.
     """
 
-    parser = argparse.ArgumentParser(usage='-i <input file> '
+    parser = argparse.ArgumentParser(usage='-i <input folder> '
                                            '-h for full usage')
-    parser.add_argument('-i', dest='file',
-                        help='input file', required=True)
+    parser.add_argument('-i', dest='folder',
+                        help='input folder', required=True)
     return parser
 
 
@@ -33,12 +34,11 @@ def parse_args(parser):
     """
 
     args = parser.parse_args()
-    file = str(args.file)
+    folder = str(args.folder)
 
-    assert os.path.exists(file)
-    assert Document(file).extension == ".csv"
+    assert os.path.exists(folder)
 
-    return file
+    return folder
 
 
 def get_output_file(file):
@@ -61,9 +61,12 @@ def get_output_file(file):
     return output_file
 
 
-def main():
-    file = parse_args(create_args())
-    log_message("Using file", file)
+def analyze_test(file):
+    """Analyze test
+
+    :param file: test file
+    :return: Analyzes data
+    """
 
     output_file = get_output_file(file)
 
@@ -71,6 +74,33 @@ def main():
     driver.save(output_file)
 
     log_message("Plot saved to", output_file)
+
+
+def analyze_day(folder):
+    """Analyze day
+
+    :param folder: day folder
+    :return: Analyzes data
+    """
+
+    files = [
+        file
+        for file in ls_recurse(folder)
+        if is_file(file) and Document(file).extension == ".csv"
+    ]
+
+    for file in files:
+        log_message("Analyzing file", file)
+        analyze_test(file)
+
+
+def main():
+    """CLI driver
+
+    :return: Creates args and execute pre-processing
+    """
+    folder = parse_args(create_args())
+    analyze_day(folder)
 
 
 if __name__ == '__main__':

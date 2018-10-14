@@ -5,6 +5,7 @@
 import argparse
 import os
 
+from hal.files.models.system import is_folder, ls_recurse
 from hal.streams.logger import log_message
 
 from peeper.preprocessing.models import Merger
@@ -16,9 +17,9 @@ def create_args():
         Parser that handles cmd arguments.
     """
 
-    parser = argparse.ArgumentParser(usage='-d <directory to parse> '
+    parser = argparse.ArgumentParser(usage='-i <input folder> '
                                            '-h for full usage')
-    parser.add_argument('-d', dest='dir',
+    parser.add_argument('-i', dest='dir',
                         help='directory to use', required=True)
     return parser
 
@@ -47,8 +48,8 @@ def get_output_file(folder):
     """
 
     folders = folder.split(os.path.sep)
-    data_time = folders[-3]
-    data_day = folders[-4]
+    data_time = folders[-2]
+    data_day = folders[-3]
     output_file = "sensors.csv"
     output_folder = folder
     for _ in range(5):
@@ -65,9 +66,12 @@ def get_output_file(folder):
     return output_file
 
 
-def main():
-    folder = parse_args(create_args())
-    log_message("Using folder", folder)
+def pre_process_test(folder):
+    """Pre-process test
+
+    :param folder: test folder
+    :return: Saves processed data
+    """
 
     output_file = get_output_file(folder)
 
@@ -75,6 +79,38 @@ def main():
     driver.merge_into(output_file)
 
     log_message("Merged into", output_file)
+
+
+def pre_process_day(folder):
+    """Pre-process day
+
+    :param folder: day folder
+    :return: Saves processed data
+    """
+
+    folders = [
+        folder
+        for folder in ls_recurse(folder)
+        if is_folder(folder)
+    ]
+    folders = [
+        folder
+        for folder in folders
+        if "Accelerometer.csv" in os.listdir(folder)
+    ]
+
+    for day_folder in folders:
+        log_message("Pre-processing", day_folder)
+        pre_process_test(day_folder)
+
+
+def main():
+    """CLI driver
+
+    :return: Creates args and execute pre-processing
+    """
+    folder = parse_args(create_args())
+    pre_process_day(folder)
 
 
 if __name__ == '__main__':

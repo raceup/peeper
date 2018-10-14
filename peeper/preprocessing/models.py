@@ -54,6 +54,32 @@ def sample_by_frequency(data, hertz):
     return sampled_data
 
 
+# todo handle removed data (if there are holes in between -> interpolate)
+def remove_null_values(data, epsilon):
+    """Removes rows that are null (under epsilon)
+
+    :param data: data frame
+    :param epsilon: remove all rows that are under this value
+    :return: data frame
+    """
+
+    to_drop = []
+
+    for i in data.index:
+        row = data.loc[i]
+        accelerations = [
+            row["AccelerometerLinear X"],
+            row["AccelerometerLinear Y"],
+            row["AccelerometerLinear Z"]
+        ]
+
+        magnitude = np.linalg.norm(accelerations)
+        if magnitude < epsilon:
+            to_drop.append(i)
+
+    return data.drop(to_drop)
+
+
 class Merger:
     """Merges multiple .csv data files into a big one"""
 
@@ -116,12 +142,21 @@ class Merger:
 
         return data
 
+    def _process(self):
+        """Process data
+
+        :return: data frame
+        """
+        data = self._merge()
+        data = sample_by_frequency(data, 10)
+        data = remove_null_values(data, 1)
+        return data
+
     def merge_into(self, output_file):
         """Merges all inputs files into one
 
         :param output_file: output file (where to write data)
         """
 
-        data = self._merge()
-        data = sample_by_frequency(data, 5)
+        data = self._process()
         data.to_csv(output_file, index_label="Milliseconds")
