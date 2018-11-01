@@ -8,6 +8,8 @@ import os
 from hal.streams.pretty_table import pretty_format_table
 from parse import parse
 
+from preprocessing.ellipse2n import get_STATUS_01, get_IMU_INFO, get_IMU_ACCEL
+
 DATA_FIELD_FORMATTERS = [
     " {:d}    {:d}         {:d}" + "  {:x}" * i + "    " * (8 - i) +
     "     {:f} {:w}"
@@ -115,6 +117,32 @@ def parse_args(parser):
     return file
 
 
+def parse_messages(messages, msg_id, func, result_labels):
+    """Parses Ellipse2N messages
+
+    :param messages: list of messages
+    :param msg_id: ID of messages to parse
+    :param func: callable to parse data
+    :param result_labels: labels of result
+    :return: Shows parsed data
+    """
+
+    messages = [
+        message.get_values() + list(message.parse_data(func))
+        for message in messages
+        if message.msg_id == msg_id  # just this ID
+    ]
+
+    labels = ["Channel", "ID (hex)", "DLC"] + [
+        "Byte " + str(i)
+        for i in range(8)
+    ] + ["Timestamp (s)",
+         "Transmission"] + \
+             result_labels
+
+    print(pretty_format_table(labels, messages))
+
+
 def parse_file(path):
     """Parses .log file
 
@@ -127,18 +155,13 @@ def parse_file(path):
         CanbusMessage.parse_kvaser(line)
         for line in lines
     ]
-    for m in messages:
-        print(m)
-    values = [
-        message.get_values()
-        for message in messages
-    ]
-    labels = ["Channel", "ID (hex)", "DLC"] + [
-        "Byte " + str(i)
-        for i in range(8)
-    ] + ["Timestamp (s)", "?"]
 
-    print(pretty_format_table(labels, values))
+    parse_messages(messages, 100, get_STATUS_01,
+                   ["TIME_STAMP (s)", "GENERAL_STATUS", "CLOCK_STATUS"])
+    parse_messages(messages, 120, get_IMU_INFO,
+                   ["TIME_STAMP (s)", "IMU_STATUS", "TEMPERATURE (°C)"])
+    parse_messages(messages, 121, get_IMU_ACCEL,
+                   ["ACCEL_X (m/s²)", "ACCEL_Y (m/s²)", "ACCEL_Z (m/s²)"])
 
 
 def main():
