@@ -1,2 +1,7 @@
-pyhal>=10.2.6
+PyHal>=10.2.6
 pandas>=0.23.4
+send2trash
+pyparsing
+scipy
+matplotlib
+parse>=1.9.0
