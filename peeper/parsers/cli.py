@@ -115,29 +115,19 @@ def parse_file(file_path):
         message_class['labels']
         for message_class in message_classes
     ]
+    files_list = [
+        message_class['id']
+        for message_class in message_classes
+    ]
 
-    # output_folder = '/home/stefano/Projects/raceup/2018-19/telemetry/_data/2019-05-04/out/'
-    # for i in range(len(message_classes)):
-    #     messages = messages_list[i]
-    #     labels = labels_list[i]
-    #     file_out = '{}.csv'.format(message_classes[i]['id'])
-    #     file_out = os.path.join(output_folder, file_out)
-    #
-    #     df = pd.DataFrame(
-    #         messages,
-    #         columns=[
-    #             'byte 0',
-    #             'byte 1',
-    #             'byte 2',
-    #             'byte 3',
-    #             'byte 4',
-    #             'byte 5',
-    #             'byte 6',
-    #             'byte 7',
-    #             'time (s)'
-    #         ] + labels
-    #     )
-    #     df.to_csv(file_out, index=False)
+    # save to .csv
+    output_folder = os.path.join(os.getcwd(), 'out')
+    explorer.save_many_to_csv(
+        messages_list,
+        labels_list,
+        files_list,
+        output_folder
+    )
 
     # print all classes
     # explorer.pretty_print(messages_list, labels_list)
@@ -145,9 +135,6 @@ def parse_file(file_path):
     # 2 x 2 plots
     for i in range(1, 5, 1):
         plt.subplot(2, 2, i)  # select subplot
-        # for values in throttle_brake_chart:  # plot throttle brake
-        #     times, ys, label = values[0], values[1], values[2]
-        #     plt.plot(times, ys, label)
 
         explorer.plot(messages_list[0], labels_list[0], time_index=8, y_indexes=[9, 10])  # throttle brake
         explorer.plot(messages_list[1], labels_list[1], time_index=8, y_indexes=[9])  # current

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """ Parses CAN log file """
+import os
 
+import pandas as pd
 from hal.streams.pretty_table import pretty_format_table
 from matplotlib import pyplot as plt
-import numpy as np
 
 
 class LogExplorer:
@@ -24,6 +25,23 @@ class LogExplorer:
             labels = self.parser.DEFAULT_LABELS + labels
             table = pretty_format_table(labels, messages)
             print(table)
+
+    def save_to_csv(self, messages, labels, file_path):
+        df = pd.DataFrame(
+            messages,
+            columns=self.parser.DEFAULT_LABELS + labels
+        )
+        df.to_csv(file_path, index=False)
+
+    def save_many_to_csv(self, messages_list, labels_list, names_list, folder_path):
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        for (messages, labels, file_name) in zip(messages_list, labels_list, names_list):
+            file_path = '{}.csv'.format(file_name)  # .csv extension
+            file_path = os.path.join(folder_path, file_path)
+
+            self.save_to_csv(messages, labels, file_path)
 
     @staticmethod
     def plot(messages, labels, time_index, y_indexes):
