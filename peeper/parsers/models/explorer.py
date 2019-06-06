@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """ Parses CAN log file """
+import datetime
 import os
 
+import math
 import pandas as pd
 from hal.streams.pretty_table import pretty_format_table
 from matplotlib import pyplot as plt
@@ -44,6 +46,12 @@ class LogExplorer:
             self.save_to_csv(messages, labels, file_path)
 
     @staticmethod
+    def _min2sec(seconds, seconds_in_minute=60):
+        time_sec = int(seconds % seconds_in_minute)
+        time_min = int(math.floor(seconds / seconds_in_minute))
+        return '{}\' {}"'.format(time_min, time_sec)
+
+    @staticmethod
     def plot(messages, labels, time_index, y_indexes):
         timestamps = [
             float(message[time_index])
@@ -63,6 +71,7 @@ class LogExplorer:
                 pass  # todo print exc
 
         plt.xlabel('Timestamp (s)')
+
         plt.legend()
 
     @staticmethod

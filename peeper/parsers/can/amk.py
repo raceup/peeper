@@ -60,18 +60,31 @@ class AMKParser(BytesParser):
         raw_values[2] = twos_complement(self.bytes2int32(raw_values[2]), 16) * scaling  # torque current
         raw_values[3] = twos_complement(self.bytes2int32(raw_values[3]), 16) * scaling  # magnet current
 
-        calc_torque = 0.243 * raw_values[2] + (9 * 10 ** -4) * raw_values[2] * raw_values[3]
+        torque_curr = raw_values[2]
+        magnet_curr = raw_values[3]
+        calc_torque = 0.243 * torque_curr + (9 * 10 ** -4) * torque_curr * magnet_curr
         raw_values.append(calc_torque)
 
         return raw_values
+
+    def _get_as_temperature(self, raw):
+        raw = self.bytes2int32(raw)  # temperature
+        raw = twos_complement(raw, 16) * 0.1  # signed, 0.1 deg
+        return raw
 
     def get_as_actual_values_2(self):
         byte_num = 2
         num_values = 4
 
-        raw_values = self.parse(
-            num_values * [byte_num], [10 ** -1, 10 ** -1, 1, 10 ** -1],
-            toggle_endianness=False, two_complement=True
+        raw_values = self.split_by_lengths(
+            num_values * [byte_num]
         )
-        raw_values[2] = self.to_binary(raw_values[2], 16)  # in bits
+
+        raw_error = hex2dec(''.join(raw_values[2]))
+        raw_values[2] = self.to_binary(raw_error, 16)  # error is in bits
+
+        temperature_indeces = [0, 1, 3]
+        for i in temperature_indeces:
+            raw_values[i] = self._get_as_temperature(raw_values[i])
+
         return raw_values

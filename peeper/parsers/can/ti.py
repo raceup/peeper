@@ -3,7 +3,7 @@
 """Parses TI data"""
 
 from parsers.can.models import BytesParser
-from parsers.can.utils import bytes2int32
+from parsers.can.utils import bytes2int32, twos_complement
 
 
 class TIParser(BytesParser):
@@ -51,23 +51,25 @@ class TIParser(BytesParser):
         return [front_break, rear_break]
 
     def get_as_suspensions_1(self):
-        byte_num = 4
-        num_values = 2
+        potentiometers_length_mm = 220
 
-        susps = self.parse(
-            num_values * [byte_num], [10 ** -4, 10 ** -4],
-            toggle_endianness=True, two_complement=True
-        )
-        for i, susp in enumerate(susps):
-            susps[i] = (susp - 434) / 70
+        right = bytes2int32(self.bytes[:4], 'f')
+        right *= -10 ** -2 / (14 * 2)
+        right *= potentiometers_length_mm
 
-        return susps
+        left = bytes2int32(self.bytes[4:], 'f')
+        left *= 10 ** -2 / (9 * 2)
+        left *= potentiometers_length_mm
+
+        return [
+            right, left
+        ]
 
     def get_as_suspensions_2(self):
         return self.get_as_suspensions_1()
 
     def get_as_current_sensor(self):
-        raw_curr = bytes2int32(self.bytes[:4], 'f')
-        real_curr = 100 * ((raw_curr * 5 / 5.1) - 2.5)
+        raw_curr = bytes2int32(self.bytes[:4], 'I')
+        real_curr = (raw_curr * 5 / 5.1) - 2.5
         real_curr = - real_curr  # sensor was mounted the other way around
         return [real_curr]

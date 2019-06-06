@@ -6,6 +6,7 @@ import argparse
 import os
 
 from matplotlib import pyplot as plt
+import matplotlib.dates as mdates
 
 from parsers.can.amk import AMKParser
 from parsers.can.ti import TIParser
@@ -70,32 +71,42 @@ def parse_file(file_path):
             "func": TIParser.get_as_potentiometers
         },
         {
-            "id": "23",
-            "labels": ["current sensor (A)"],
+            "id": "14",
+            "labels": ["steering (°)", "TI core temp (C)"],
             "bytes parser": TIParser,
-            "func": TIParser.get_as_current_sensor
+            "func": TIParser.get_as_steering
+        },
+        {
+            "id": "16",
+            "labels": ["FR susp (mm)", "FL susp (mm)"],
+            "bytes parser": TIParser,
+            "func": TIParser.get_as_suspensions_1
         },
         {
             "id": "283",
-            "labels": ["FL actual velocity (rpm)", "FL calc torque (Nm)"],
+            "labels": ["FL status", "FL actual velocity (x100 rpm)", "FL torque curr (A)", "FL mag curr (A)",
+                       "FL calc torque (Nm)"],
             "bytes parser": AMKParser,
             "func": AMKParser.get_as_actual_values_1
         },
         {
             "id": "284",
-            "labels": ["FR actual velocity (rpm)", "FR calc torque (Nm)"],
+            "labels": ["FR status", "FR actual velocity (x100 rpm)", "FR torque curr (A)", "FR mag curr (A)",
+                       "FR calc torque (Nm)"],
             "bytes parser": AMKParser,
             "func": AMKParser.get_as_actual_values_1
         },
         {
             "id": "287",
-            "labels": ["RL actual velocity (rpm)", "RL calc torque (Nm)"],
+            "labels": ["RL status", "RL actual velocity (x100 rpm)", "RL torque curr (A)", "RL mag curr (A)",
+                       "RL calc torque (Nm)"],
             "bytes parser": AMKParser,
             "func": AMKParser.get_as_actual_values_1
         },
         {
             "id": "288",
-            "labels": ["RR actual velocity (rpm)", "RR calc torque (Nm)"],
+            "labels": ["RR status", "RR actual velocity (x100 rpm)", "RR torque curr (A)", "RR mag curr (A)",
+                       "RR calc torque (Nm)"],
             "bytes parser": AMKParser,
             "func": AMKParser.get_as_actual_values_1
         }
@@ -121,24 +132,33 @@ def parse_file(file_path):
     ]
 
     # save to .csv
-    output_folder = os.path.join(os.getcwd(), 'out')
-    explorer.save_many_to_csv(
-        messages_list,
-        labels_list,
-        files_list,
-        output_folder
-    )
+    # output_folder = os.path.join(os.getcwd(), 'out')
+    # print('Saving to {}'.format(output_folder))
+    # explorer.save_many_to_csv(
+    #     messages_list,
+    #     labels_list,
+    #     files_list,
+    #     output_folder
+    # )
 
     # print all classes
     # explorer.pretty_print(messages_list, labels_list)
 
     # 2 x 2 plots
-    for i in range(1, 5, 1):
-        plt.subplot(2, 2, i)  # select subplot
+    # for i in range(3, 7, 1):
+    #     plt.subplot(2, 2, i - 2)  # select subplot
+    #
+    #     explorer.plot(messages_list[0], labels_list[0], time_index=8, y_indexes=[9, 10])  # throttle brake
+    #     explorer.plot(messages_list[1], labels_list[1], time_index=8, y_indexes=[9])  # steering
+    #     explorer.plot(messages_list[2], labels_list[2], time_index=8, y_indexes=[9, 10])  # potentiometers
+    #
+    #     explorer.plot(messages_list[i], labels_list[i][1:], time_index=8, y_indexes=[10])  # motors
 
-        explorer.plot(messages_list[0], labels_list[0], time_index=8, y_indexes=[9, 10])  # throttle brake
-        explorer.plot(messages_list[1], labels_list[1], time_index=8, y_indexes=[9])  # current
-        explorer.plot(messages_list[i + 1], labels_list[i + 1], time_index=8, y_indexes=[10, 13])
+    explorer.plot(messages_list[0], labels_list[0], time_index=8, y_indexes=[9, 10])  # throttle brake
+    explorer.plot(messages_list[1], labels_list[1], time_index=8, y_indexes=[9])  # steering
+    explorer.plot(messages_list[2], labels_list[2], time_index=8, y_indexes=[9, 10])  # potentiometers
+
+    explorer.plot(messages_list[6], labels_list[6][1:], time_index=8, y_indexes=[10])  # motors
 
     # show plots
     plt.show()

@@ -58,4 +58,5 @@ def bytes2int32(bytes_list, convert_to='I'):
     ]
     raw_list = binascii.hexlify(bytearray(ints))
     raw = struct.unpack(convert_to, codecs.decode(raw_list, 'hex_codec'))
-    return int(raw[0])
+    result = int(raw[0])
+    return result
