@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """ Parses CAN log file """
-import datetime
+import math
 import os
 
-import math
 import pandas as pd
 from hal.streams.pretty_table import pretty_format_table
 from matplotlib import pyplot as plt
@@ -45,6 +44,50 @@ class LogExplorer:
 
             self.save_to_csv(messages, labels, file_path)
 
+    def plot(self, messages_list, labels_list):
+        for i in range(1, 8, 2):
+            plt.subplot(2, 2, int(i / 2) + 1)  # select subplot
+
+            # labels = [labels_list[i][1]]
+            # y_indexes = [10, 11, 12, 13]
+
+            labels = [labels_list[i][0], labels_list[i][1], labels_list[i][3]]
+            y_indexes = [9, 10, 12]
+
+            self._plot(messages_list[i], labels, time_index=8, y_indexes=y_indexes)
+
+        # show plots
+        plt.show()
+
+    def get_lists(self, message_classes):
+        messages_list = [
+            self.get_messages(
+                message_class['bytes parser'],
+                message_class['func'],
+                msg_id=message_class['id']
+            )
+            for message_class in message_classes
+        ]  # parse
+        labels_list = [
+            message_class['labels']
+            for message_class in message_classes
+        ]
+        files_list = [
+            message_class['filename']
+            for message_class in message_classes
+        ]
+        return messages_list, labels_list, files_list
+
+    def save(self, messages_list, labels_list, files_list, output_folder):
+        if output_folder:
+            print('Saving to {}'.format(output_folder))
+            self.save_many_to_csv(
+                messages_list,
+                labels_list,
+                files_list,
+                output_folder
+            )
+
     @staticmethod
     def _min2sec(seconds, seconds_in_minute=60):
         time_sec = int(seconds % seconds_in_minute)
@@ -52,7 +95,7 @@ class LogExplorer:
         return '{}\' {}"'.format(time_min, time_sec)
 
     @staticmethod
-    def plot(messages, labels, time_index, y_indexes):
+    def _plot(messages, labels, time_index, y_indexes):
         timestamps = [
             float(message[time_index])
             for message in messages

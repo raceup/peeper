@@ -13,20 +13,14 @@ AMK_VALUES_2_CAN_IDS = ['285', '286', '289', '28a']
 AMK_SETPOINTS_CAN_IDS = ['184', '185', '188', '189']
 
 AMK_VALUES_1 = {
-    Motors.FL: AMK_VALUES_1_CAN_IDS[Motors.FL.value],
-    Motors.FR: AMK_VALUES_1_CAN_IDS[Motors.FR.value],
-    Motors.RL: AMK_VALUES_1_CAN_IDS[Motors.RL.value],
-    Motors.RR: AMK_VALUES_1_CAN_IDS[Motors.RR.value]
+    motor: AMK_VALUES_1_CAN_IDS[motor.value]
+    for motor in Motors
 }
 AMK_VALUES_2 = {
-    Motors.FL: AMK_VALUES_2_CAN_IDS[Motors.FL.value],
-    Motors.FR: AMK_VALUES_2_CAN_IDS[Motors.FR.value],
-    Motors.RL: AMK_VALUES_2_CAN_IDS[Motors.RL.value],
-    Motors.RR: AMK_VALUES_2_CAN_IDS[Motors.RR.value]
+    motor: AMK_VALUES_2_CAN_IDS[motor.value]
+    for motor in Motors
 }
 AMK_SETPOINTS = {
-    Motors.FL: AMK_SETPOINTS_CAN_IDS[Motors.FL.value],
-    Motors.FR: AMK_SETPOINTS_CAN_IDS[Motors.FR.value],
-    Motors.RL: AMK_SETPOINTS_CAN_IDS[Motors.RL.value],
-    Motors.RR: AMK_SETPOINTS_CAN_IDS[Motors.RR.value]
+    motor: AMK_SETPOINTS_CAN_IDS[motor.value]
+    for motor in Motors
 }

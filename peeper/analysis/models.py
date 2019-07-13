@@ -88,11 +88,11 @@ class Plotter:
         title = "Telemetry data from " + title.replace("-", ":")
         fig.suptitle(title)
 
-        self.plots["Compass"].plot(ax=ax[0, 0], title="Compass")
-        self.plots["RotationVector"].plot(ax=ax[0, 1], title="Rotation vector")
+        self.plots["Compass"]._plot(ax=ax[0, 0], title="Compass")
+        self.plots["RotationVector"]._plot(ax=ax[0, 1], title="Rotation vector")
         self.plots["AccelerometerLinear"] \
-            .plot(ax=ax[1, 0], title="Accelerations")
-        self.plots["Gyroscope"].plot(ax=ax[1, 1], title="Gyro")
+            ._plot(ax=ax[1, 0], title="Accelerations")
+        self.plots["Gyroscope"]._plot(ax=ax[1, 1], title="Gyro")
 
         plt.savefig(
             output_file,
