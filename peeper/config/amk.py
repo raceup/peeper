@@ -24,3 +24,5 @@ AMK_SETPOINTS = {
     motor: AMK_SETPOINTS_CAN_IDS[motor.value]
     for motor in Motors
 }
+
+MOTOR_LABELS = ["FL", "FR", "RL", "RR"]

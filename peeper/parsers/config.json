@@ -4,11 +4,11 @@
       "id": "288",
       "filename": "AMK1_FL",
       "labels": [
-        "FL status",
-        "FL actual velocity (x100 rpm)",
-        "FL torque curr (A)",
-        "FL mag curr (A)",
-        "FL calc torque (Nm)"
+        "status",
+        "actual velocity (x100 rpm)",
+        "torque current (A)",
+        "mag current (A)",
+        "calc torque (Nm)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_1"
@@ -17,10 +17,10 @@
       "id": "28a",
       "filename": "AMK2_FL",
       "labels": [
-        "FL T motor (°C)",
-        "FL T inverter (°C)",
-        "FL error",
-        "FL T IGBT (°C)"
+        "T motor (°C)",
+        "T inverter (°C)",
+        "error",
+        "T IGBT (°C)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_2"
@@ -29,11 +29,11 @@
       "id": "287",
       "filename": "AMK1_FR",
       "labels": [
-        "FR status",
-        "FR actual velocity (x100 rpm)",
-        "FR torque curr (A)",
-        "FR mag curr (A)",
-        "FR calc torque (Nm)"
+        "status",
+        "actual velocity (x100 rpm)",
+        "torque current (A)",
+        "mag current (A)",
+        "calc torque (Nm)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_1"
@@ -42,10 +42,10 @@
       "id": "289",
       "filename": "AMK2_FR",
       "labels": [
-        "FR T motor (°C)",
-        "FR T inverter (°C)",
-        "FR error",
-        "FR T IGBT (°C)"
+        "T motor (°C)",
+        "T inverter (°C)",
+        "error",
+        "T IGBT (°C)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_2"
@@ -54,11 +54,11 @@
       "id": "284",
       "filename": "AMK1_RL",
       "labels": [
-        "RL status",
-        "RL actual velocity (x100 rpm)",
-        "RL torque curr (A)",
-        "RL mag curr (A)",
-        "RL calc torque (Nm)"
+        "status",
+        "actual velocity (x100 rpm)",
+        "torque current (A)",
+        "mag current (A)",
+        "calc torque (Nm)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_1"
@@ -67,10 +67,10 @@
       "id": "286",
       "filename": "AMK2_RL",
       "labels": [
-        "RL T motor (°C)",
-        "RL T inverter (°C)",
-        "RL error",
-        "RL T IGBT (°C)"
+        "T motor (°C)",
+        "T inverter (°C)",
+        "error",
+        "T IGBT (°C)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_2"
@@ -79,11 +79,11 @@
       "id": "283",
       "filename": "AMK1_RR",
       "labels": [
-        "RR status",
-        "RR actual velocity (x100 rpm)",
-        "RR torque curr (A)",
-        "RR mag curr (A)",
-        "RR calc torque (Nm)"
+        "status",
+        "actual velocity (x100 rpm)",
+        "torque current (A)",
+        "mag current (A)",
+        "calc torque (Nm)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_1"
@@ -92,10 +92,10 @@
       "id": "285",
       "filename": "AMK2_RR",
       "labels": [
-        "RR T motor (°C)",
-        "RR T inverter (°C)",
-        "RR error",
-        "RR T IGBT (°C)"
+        "T motor (°C)",
+        "T inverter (°C)",
+        "error",
+        "T IGBT (°C)"
       ],
       "bytes parser": "AMKParser",
       "func": "get_as_actual_values_2"

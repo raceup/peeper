@@ -1,3 +1,4 @@
+numpy
 hal
 PyHal>=10.2.6
 pandas>=0.23.4

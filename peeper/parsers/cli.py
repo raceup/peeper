@@ -12,6 +12,8 @@ from hal.files.models.system import ls_recurse, is_file
 from parsers.logs.yolo import YOLOLogParser
 from parsers.models.explorer import LogExplorer
 
+# needed dynamic import: from parsers.can.amk import AMKParser
+
 THIS_FOLDER = os.getcwd()
 DEFAULT_OUTPUT_FOLDER = os.path.join(THIS_FOLDER, 'out')
 DEFAULT_CONFIG_FILE = os.path.join(THIS_FOLDER, 'config.json')
@@ -102,7 +104,7 @@ def main():
 
         explorer, message_classes = get_explorer(file_path, config)
         messages_list, labels_list, files_list = explorer.get_lists(message_classes)
-        explorer.plot(messages_list, labels_list)
+        # explorer.plot(messages_list, labels_list)
         explorer.save(messages_list, labels_list, files_list, output_folder)
 
 

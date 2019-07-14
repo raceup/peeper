@@ -3,8 +3,24 @@
 """Module containing analysis models"""
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-from hal.files.models.system import get_parent_folder_name
+from scipy.optimize import curve_fit
+
+
+def interpol_function(x, a, b, c):
+    # return a * (1 - np.exp(b * x)) + c
+    return a * np.log(np.multiply(x, b)) + c
+    # return a - np.divide(b, np.multiply(x, c))
+
+
+def log_interpol_events(x, y):
+    coeffs, covariance = curve_fit(interpol_function, x, y)
+
+    def interpol(x_data):
+        return interpol_function(x_data, *coeffs)
+
+    return interpol, coeffs
 
 
 class Plotter:
@@ -19,20 +35,10 @@ class Plotter:
         self.data = self._parse()
         self.plots = self._create_plots()
 
-    def _parse(self):
-        """Parses input file
-
-        :return: data in file
-        """
-
+    def _parse(self, time_index="Timestamp (s)"):
         data = pd.read_csv(self.path)
-        data = data.set_index("Milliseconds")
-        data.index.names = ["Seconds"]
-        data = data.rename(index={
-            x: x / 1000.0
-            for x in data.index
-        })  # convert to s
-
+        data = data.set_index(time_index)
+        data.index.names = [time_index]
         return data
 
     def _create_plots(self):
@@ -41,65 +47,42 @@ class Plotter:
         :return: dictionary with title and data to plot
         """
 
-        labels = {
-            "Compass": [
-                key
-                for key in self.data.keys()
-                if key.startswith("Compass")
-            ],
-            "RotationVector": [
-                key
-                for key in self.data.keys()
-                if key.startswith("RotationVector")
-            ],
-            "AccelerometerLinear": [
-                key
-                for key in self.data.keys()
-                if key.startswith("AccelerometerLinear")
-            ],
-            "Gyroscope": [
-                key
-                for key in self.data.keys()
-                if key.startswith("Gyroscope")
-            ]
-        }
-
+        data_keys = filter(
+            lambda label: not label.startswith("Byte"),
+            self.data.keys()
+        )  # just parsed data, not raw bytes
         plots = {
-            key: self.data[column_names]
-            for key, column_names in labels.items()
-        }
-        for key, plot in plots.items():
-            new_columns = {
-                column: column.replace(key, "").strip()  # remove unnecessary
-                for column in plot.keys()
-            }
-            plots[key] = plot.rename(columns=new_columns)
+            key: self.data[key]
+            for key in data_keys
+        }  # column name -> df[time, column values]
 
         return plots
 
-    def save(self, output_file):
-        """Saves plot to output
+    @staticmethod
+    def _pretty_number(x):
+        x = str(x).strip()
+        if not x.startswith('+') and not x.startswith('-'):
+            x = '+ ' + x
 
-        :param output_file: output file (where to write data)
-        """
+        return x
 
-        fig, ax = plt.subplots(2, 2, sharex="all")
-        title = get_parent_folder_name(self.path)
-        title = "Telemetry data from " + title.replace("-", ":")
-        fig.suptitle(title)
+    def plot(self, column_name):
+        df = self.plots[column_name]
+        x, y = df.index.tolist(), df.values.tolist()
+        interpol, coeffs = log_interpol_events(x, y)
 
-        self.plots["Compass"]._plot(ax=ax[0, 0], title="Compass")
-        self.plots["RotationVector"]._plot(ax=ax[0, 1], title="Rotation vector")
-        self.plots["AccelerometerLinear"] \
-            ._plot(ax=ax[1, 0], title="Accelerations")
-        self.plots["Gyroscope"]._plot(ax=ax[1, 1], title="Gyro")
+        y_trend = interpol(x)
+        diff = y - y_trend
+        std, mean = np.std(diff), np.mean(diff)
 
-        plt.savefig(
-            output_file,
-            dpi=400,
-            quality=100,
-            orientation="landscape",
-            papertype="a4",
-            format="png"
-        )
-        plt.show()
+        x_pred = range(int(min(x)), 1800, 3)
+        y_pred = interpol(x_pred)
+
+        label = '{} std: {:.2f}, mean: {:.2f}'.format(column_name, std, mean)
+
+        plt.plot(x, y, label=column_name)
+        plt.plot(x_pred, y_pred, color='r', linestyle='--', label=label)
+        plt.gcf().autofmt_xdate()  # prettify X-axis
+        plt.xlabel('Time (s)')
+
+        plt.legend()
