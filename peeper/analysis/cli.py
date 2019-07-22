@@ -65,16 +65,24 @@ def analyze_motors(folder):
         os.path.join(folder, "AMK2_{}.csv".format(motor))
         for motor in MOTOR_LABELS
     ]
+    ti_file = os.path.join(folder, "TI.csv")
 
     # 2 x 2 plots
 
-    for i, file in enumerate(files):
-        driver = Plotter(file)
+    ti_plotter = Plotter(ti_file)
+    ti_plots = ["throttle (%)", "brake (%)"]
 
+    for i, file in enumerate(files):
         plt.subplot(2, 2, i + 1)  # select subplot
-        driver.plot("T motor (°C)")
-        driver.plot("T inverter (°C)")
-        driver.plot("T IGBT (°C)")
+
+        driver = Plotter(file)
+        # driver.plot("actual velocity (x100 rpm)")
+        driver.plot("T motor (°C)", with_trend=True)
+        driver.plot("T inverter (°C)", with_trend=True)
+        driver.plot("T IGBT (°C)", with_trend=True)
+
+        for k in ti_plots:
+            ti_plotter.plot(k)
 
     folder_name = get_folder_name(folder)
     title = '{}'.format(folder_name)

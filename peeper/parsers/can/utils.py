@@ -2,8 +2,8 @@
 
 """CAN utils"""
 
-import codecs
 import binascii
+import codecs
 import struct
 
 
@@ -60,3 +60,7 @@ def bytes2int32(bytes_list, convert_to='I'):
     raw = struct.unpack(convert_to, codecs.decode(raw_list, 'hex_codec'))
     result = int(raw[0])
     return result
+
+
+def bytes2short(bytes_list):
+    return hex2dec(bytes_list[0]) * 2 ** 8 + hex2dec(bytes_list[1])

@@ -12,7 +12,7 @@ from hal.files.models.system import ls_recurse, is_file
 from parsers.logs.yolo import YOLOLogParser
 from parsers.models.explorer import LogExplorer
 
-# needed dynamic import: from parsers.can.amk import AMKParser
+# needed dynamic import:
 
 THIS_FOLDER = os.getcwd()
 DEFAULT_OUTPUT_FOLDER = os.path.join(THIS_FOLDER, 'out')

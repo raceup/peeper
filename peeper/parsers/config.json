@@ -1,6 +1,18 @@
 {
   "messages": [
     {
+      "id": "A",
+      "filename": "TI",
+      "labels": [
+        "throttle (%)",
+        "brake (%)",
+        "steering (°)",
+        "speed (KPH)"
+      ],
+      "bytes parser": "TIParser",
+      "func": "get_all"
+    },
+    {
       "id": "288",
       "filename": "AMK1_FL",
       "labels": [

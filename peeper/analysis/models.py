@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 
 
 def interpol_function(x, a, b, c):
-    # return a * (1 - np.exp(b * x)) + c
+    # return a * (1 - np.power(x, b)) + c
     return a * np.log(np.multiply(x, b)) + c
     # return a - np.divide(b, np.multiply(x, c))
 
@@ -66,23 +66,25 @@ class Plotter:
 
         return x
 
-    def plot(self, column_name):
+    def plot(self, column_name, with_trend=False):
         df = self.plots[column_name]
         x, y = df.index.tolist(), df.values.tolist()
-        interpol, coeffs = log_interpol_events(x, y)
-
-        y_trend = interpol(x)
-        diff = y - y_trend
-        std, mean = np.std(diff), np.mean(diff)
-
-        x_pred = range(int(min(x)), 1800, 3)
-        y_pred = interpol(x_pred)
-
-        label = '{} std: {:.2f}, mean: {:.2f}'.format(column_name, std, mean)
-
         plt.plot(x, y, label=column_name)
-        plt.plot(x_pred, y_pred, color='r', linestyle='--', label=label)
+
+        if with_trend:
+            interpol, coeffs = log_interpol_events(x, y)
+
+            y_trend = interpol(x)
+            diff = y - y_trend
+            std, mean = np.std(diff), np.mean(diff)
+
+            x_pred = range(int(min(x)), 900, 3)
+            y_pred = interpol(x_pred)
+
+            label = '{} std: {:.2f}, mean: {:.2f}'.format(column_name, std, mean)
+
+            plt.plot(x_pred, y_pred, color='r', linestyle='--', label=label)
+
         plt.gcf().autofmt_xdate()  # prettify X-axis
         plt.xlabel('Time (s)')
-
         plt.legend()
