@@ -62,7 +62,7 @@ def analyze_test(file):
 
 def analyze_motors(folder):
     files = [
-        os.path.join(folder, "AMK2_{}.csv".format(motor))
+        os.path.join(folder, "AMK1_{}.csv".format(motor))
         for motor in MOTOR_LABELS
     ]
     ti_file = os.path.join(folder, "TI.csv")
@@ -70,16 +70,23 @@ def analyze_motors(folder):
     # 2 x 2 plots
 
     ti_plotter = Plotter(ti_file)
-    ti_plots = ["throttle (%)", "brake (%)"]
+    ti_plots = []  # ["throttle (%)", "brake (%)"]
 
     for i, file in enumerate(files):
         plt.subplot(2, 2, i + 1)  # select subplot
 
         driver = Plotter(file)
-        # driver.plot("actual velocity (x100 rpm)")
-        driver.plot("T motor (°C)", with_trend=True)
-        driver.plot("T inverter (°C)", with_trend=True)
-        driver.plot("T IGBT (°C)", with_trend=True)
+        driver.plot("actual velocity (x100 rpm)")
+        driver.plot("calc torque (Nm)")
+
+        def current_combo(rpms, torques):
+            return [
+                rpms[j] * 100 / 60 * 2 * 3.14159265354 * torques[j] / 350
+                for j in range(len(rpms))
+            ]
+
+        combo_inputs = ["actual velocity (x100 rpm)", "calc torque (Nm)"]
+        driver.plot_combo(combo_inputs, current_combo, "current (A)")
 
         for k in ti_plots:
             ti_plotter.plot(k)

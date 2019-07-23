@@ -66,25 +66,47 @@ class Plotter:
 
         return x
 
+    @staticmethod
+    def _plot_trend(x, y, label):
+        interpol, coeffs = log_interpol_events(x, y)
+
+        y_trend = interpol(x)
+        diff = y - y_trend
+        std, mean = np.std(diff), np.mean(diff)
+
+        x_pred = range(int(min(x)), 900, 3)
+        y_pred = interpol(x_pred)
+
+        label = '{} std: {:.2f}, mean: {:.2f}'.format(label, std, mean)
+
+        plt.plot(x_pred, y_pred, color='r', linestyle='--', label=label)
+
+    @staticmethod
+    def _finalize():
+        plt.gcf().autofmt_xdate()  # prettify X-axis
+        plt.xlabel('Time (s)')
+        plt.legend()
+
     def plot(self, column_name, with_trend=False):
         df = self.plots[column_name]
         x, y = df.index.tolist(), df.values.tolist()
         plt.plot(x, y, label=column_name)
 
         if with_trend:
-            interpol, coeffs = log_interpol_events(x, y)
+            self._plot_trend(x, y, column_name)
 
-            y_trend = interpol(x)
-            diff = y - y_trend
-            std, mean = np.std(diff), np.mean(diff)
+        self._finalize()
 
-            x_pred = range(int(min(x)), 900, 3)
-            y_pred = interpol(x_pred)
+    def plot_combo(self, labels, f, label, with_trend=False):
+        values = [
+            self.plots[label].values.tolist()
+            for label in labels
+        ]
+        y = f(*values)
+        x = self.plots[labels[0]].index.tolist()  # the same for all
+        plt.plot(x, y, label=label)
 
-            label = '{} std: {:.2f}, mean: {:.2f}'.format(column_name, std, mean)
+        if with_trend:
+            self._plot_trend(x, y, label)
 
-            plt.plot(x_pred, y_pred, color='r', linestyle='--', label=label)
-
-        plt.gcf().autofmt_xdate()  # prettify X-axis
-        plt.xlabel('Time (s)')
-        plt.legend()
+        self._finalize()
