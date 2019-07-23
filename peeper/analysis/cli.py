@@ -8,6 +8,8 @@ import os
 import matplotlib.pyplot as plt
 from hal.files.models.system import get_parent_folder_name, get_folder_name
 
+from analysis.tools.combos import current_combo
+from analysis.tools.filters import kalman
 from config.amk import MOTOR_LABELS
 from peeper.analysis.models import Plotter
 
@@ -76,14 +78,7 @@ def analyze_motors(folder):
         plt.subplot(2, 2, i + 1)  # select subplot
 
         driver = Plotter(file)
-        driver.plot("actual velocity (x100 rpm)")
-        driver.plot("calc torque (Nm)")
-
-        def current_combo(rpms, torques):
-            return [
-                rpms[j] * 100 / 60 * 2 * 3.14159265354 * torques[j] / 350
-                for j in range(len(rpms))
-            ]
+        driver.plot_filter("actual velocity (x100 rpm)", kalman)
 
         combo_inputs = ["actual velocity (x100 rpm)", "calc torque (Nm)"]
         driver.plot_combo(combo_inputs, current_combo, "current (A)")

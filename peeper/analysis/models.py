@@ -110,3 +110,11 @@ class Plotter:
             self._plot_trend(x, y, label)
 
         self._finalize()
+
+    def plot_filter(self, column_name, f):
+        df = self.plots[column_name]
+        x, y = df.index.tolist(), df.values.tolist()
+        y_filtered = f(y)
+        label = '{} (filtered)'.format(column_name)
+        plt.plot(x, y_filtered, label=label)
+        self._finalize()
