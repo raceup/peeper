@@ -5,22 +5,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.optimize import curve_fit
 
-
-def interpol_function(x, a, b, c):
-    # return a * (1 - np.power(x, b)) + c
-    return a * np.log(np.multiply(x, b)) + c
-    # return a - np.divide(b, np.multiply(x, c))
-
-
-def log_interpol_events(x, y):
-    coeffs, covariance = curve_fit(interpol_function, x, y)
-
-    def interpol(x_data):
-        return interpol_function(x_data, *coeffs)
-
-    return interpol, coeffs
+from analysis.tools.combos import get_combo
+from analysis.tools.interpol import log_interpol_events
 
 
 class Plotter:
@@ -67,6 +54,10 @@ class Plotter:
         return x
 
     @staticmethod
+    def _plot_data(x, y, label):
+        plt.plot(x, y, label=label)
+
+    @staticmethod
     def _plot_trend(x, y, label):
         interpol, coeffs = log_interpol_events(x, y)
 
@@ -87,6 +78,16 @@ class Plotter:
         plt.xlabel('Time (s)')
         plt.legend()
 
+    def _get_time_index(self):
+        return self.data.index.tolist()
+
+    def _get_combo(self, labels, f):
+        values = [
+            self.plots[label].values.tolist()
+            for label in labels
+        ]
+        return get_combo(values, f)
+
     def plot(self, column_name, with_trend=False):
         df = self.plots[column_name]
         x, y = df.index.tolist(), df.values.tolist()
@@ -97,12 +98,19 @@ class Plotter:
 
         self._finalize()
 
+    def plot_values(self, values, label, with_filter=None):
+        x = self._get_time_index()
+        plt.plot(x, values, label=label)
+
+        if with_filter:
+            y_filtered = with_filter(values)
+            label = '{} (filtered)'.format(label)
+            plt.plot(x, y_filtered, label=label)
+
+        self._finalize()
+
     def plot_combo(self, labels, f, label, with_trend=False):
-        values = [
-            self.plots[label].values.tolist()
-            for label in labels
-        ]
-        y = f(*values)
+        y = self._get_combo(labels, f)
         x = self.plots[labels[0]].index.tolist()  # the same for all
         plt.plot(x, y, label=label)
 
